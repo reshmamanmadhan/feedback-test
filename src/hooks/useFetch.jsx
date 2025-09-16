@@ -8,8 +8,6 @@ function useFetch(url) {
   useEffect(() => {
     if (!url) return;
 
-    setLoading(true);
-    setError(null);
 
     fetch(url)
       .then((res) => {
