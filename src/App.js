@@ -1,26 +1,43 @@
-// src/App.js
-import React,{useState} from "react";
-import FeedbackPage from "./components/FeedbackPage"; 
-import ThankYouPage from "./components/ThankyouPage"; 
-import "./App.css"; 
+import React, { useState } from 'react';
+import useFetch from './hooks/useFetch';
+import './App.css'; 
 
 function App() {
-   const [feedback, setFeedback] = useState("");
+  const { data, loading, error } = useFetch('https://jsonplaceholder.typicode.com/comments');
+  const [searchTerm, setSearchTerm] = useState('');
 
-    const handleFeedback = (selectedFeedback) => {
-    setFeedback(selectedFeedback);
-  };
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
 
-  const handleReset = () => {
-    setFeedback("");
-  };
+  const filteredComments = 
+  searchTerm 
+  ? data?.filter(comment => comment.id === Number(searchTerm)) 
+  : data;
+
   return (
-    <div>
-      {!feedback ? (
-        <FeedbackPage onFeedback={handleFeedback} />
-      ) : (
-        <ThankYouPage feedback={feedback} onReset={handleReset} />
-      )}
+    <div className="container">
+      <h1>Comments</h1>
+
+      {/* search input */}
+      <input
+        type="text"
+        placeholder="Search by name or body..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="search-input"
+      />
+
+      <ul className="comments-list">
+        {filteredComments?.map(post => (
+          <li key={post.id} className="comment-card">
+            <div className="comment-id">{post.id}</div>
+            <div className="comment-details">
+              <h3 className="comment-name">{post.name}</h3>
+              <p className="comment-body">{post.body}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
